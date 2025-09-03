@@ -4,44 +4,285 @@
 
 Este projeto de dados visa a construção de um pipeline ETL (Extract, Transform, Load) utilizando a **arquitetura de medalhão** para processar e analisar dados de venda de medicamentos controlados e antimicrobianos no Brasil.
 
-A base de dados, proveniente do Sistema Nacional de Gerenciamento de Produtos Controlados (SNGPC), é disponibilizada publicamente pelo governo federal brasileiro. O objetivo principal é demonstrar a viabilidade de ingerir e tratar esses dados para suportar futuras aplicações de Business Intelligence (BI).
-
-[Base de dados SNGPC](https://dados.gov.br/dados/conjuntos-dados/venda-de-medicamentos-controlados-e-antimicrobianos---medicamentos-industrializados "Dados abertos gov br sngpc").
+A base de dados, proveniente do  Sistema Nacional de Gerenciamento de Produtos Controlados  [Base de dados SNGPC](https://dados.gov.br/dados/conjuntos-dados/venda-de-medicamentos-controlados-e-antimicrobianos---medicamentos-industrializados "Dados abertos gov br sngpc").   Disponibilizada publicamente pelo governo federal brasileiro. O objetivo principal é demonstrar a viabilidade de ingerir e tratar esses dados para suportar futuras aplicações de Business Intelligence (BI).
 
 Os dados brutos são gerados a partir das movimentações de entrada e saída de medicamentos em farmácias e drogarias privadas do país, sendo a escrituração de responsabilidade do farmacêutico responsável técnico.
 
 O projeto aborda um recorte temporal de **janeiro de 2014 a novembro de 2021**, pois a distribuição pública dos dados foi descontinuada após esse período.
 
-## Arquitetura do Projeto
-
-O projeto adota a **arquitetura de medalhão**, que organiza os dados em camadas para garantir a qualidade e o enriquecimento progressivo das informações.
-
-* **Camada Bronze:** Recebe os dados brutos (raw data) diretamente da fonte, sem transformações iniciais, mantendo a integridade dos dados originais.
-* **Camada Silver:** Os dados da camada Bronze passam por limpeza e normalização, incluindo padronização de formatos, remoção de duplicatas e tratamento de valores nulos.
-* **Camada Gold:** A fonte de dados para aplicações de análise e consumo. Os dados são enriquecidos, agregados e otimizados para ferramentas de BI.
-
-Todo o fluxo de dados, da ingestão inicial ao enriquecimento final, é executado inteiramente na plataforma **Databricks**, utlizando a versão Free Edition.
-
 ## Objetivos do Projeto
 
 O objetivo central é realizar o processo de ingestão, estruturação e modelagem dos dados para permitir o desenvolvimento de ferramentas analíticas.
 
-### Egenharia de dados (ETL)
-
 * **Ingestão de Dados:** Tratar o grande volume de dados, que estão separados em arquivos CSV mensais, e transformá-los para o formato Delta na camada **Bronze**.
 * **Estruturação e Modelagem Robusta:** Unificar todos os arquivos CSV em uma única tabela, tratando dados nulos, adaptando tipos de dados (já que todos vêm como string) e criando colunas para identificar o ano e o mês de cada registro.
-* **Modelagem Star Schema:** Visando otimizar as buscas feitas na camada ouro será usada a abordagem de star schema.
+
+
+
+## Arquitetura de Dados
+
+O projeto segue a **arquitetura de medalhão** para organizar e processar os dados, com a governança centralizada pelo **Databricks Unity Catalog**. Essa abordagem garante a progressão da qualidade dos dados à medida que eles se movem através das camadas.
+
+A estrutura lógica de armazenamento dos dados no Unity Catalog é a seguinte:
+
+* **Catálogo `controlled_medication_data`:** Contêiner de alto nível do projeto, servindo como o ambiente principal.
+
+* **Schemas (Camadas):** As camadas da arquitetura de medalhão são implementadas como schemas separados para isolar os dados em cada etapa do pipeline:
+
+    * **`bronze_layer`:** Schema que armazena os dados brutos. Ele contém o **volume `raw_data`**, que serve como local de staging para os arquivos CSV baixados, e a tabela `tabelas_bronze`.
+
+    * **`silver_layer`:** Schema onde os dados brutos são unificados, limpos e tratados. A tabela desta camada contém todos os dados do SNGPC consolidados, com tipos de dados corrigidos e valores nulos tratados, garantindo a confiabilidade dos dados.
+
+    * **`gold_layer`:** Schema que armazena as tabelas finais, otimizadas para consumo de BI. Aqui é implementado um **star schema** e **views**, que são a fonte de dados para painéis e relatórios analíticos, como os criados no Power BI.
+
+
+
+## Camada Bronze: Ingestão de Dados
+
+A ingestão de dados foi realizada por meio de notebooks Python no Databricks, utilizando a biblioteca `requests` para fazer o download direto das URLs dos arquivos CSV.
+
+* **Dados Principais (SNGPC):** O notebook `baixando_dados_brutos.py` foi responsável por baixar os arquivos mensais da base de dados de Venda de Medicamentos Controlados e Antimicrobianos. O processo percorre o período de 2014 a 2021 e salva cada arquivo CSV em um **Volume do Unity Catalog**, organizando-os em subdiretórios por ano.
+
+* **Dados de Georreferenciamento:** O notebook `latitude_lingitude_dados.py` foi usado para obter dados de geolocalização dos municípios brasileiros, fundamentais para análises regionais. Os arquivos `estados.csv` e `municipios.csv` foram baixados de um repositório do GitHub e também armazenados nos volumes do Databricks.
+
+
+## Camada Silver: Limpeza e Enriquecimento de Dados
+
+O notebook `unificando_e_tratando_dados.py` é responsável pela transição dos dados da camada `bronze_layer` para a `silver_layer`. Ele executa o processo de unificação, limpeza e enriquecimento para criar a tabela principal de fatos do projeto. As principais etapas realizadas foram:
+
+* **Unificação dos dados:** Os dataframes de cada ano (2014 a 2021) foram lidos individualmente e unidos em um único dataframe para criar uma tabela consolidada.
+* **Tratamento de dados nulos:** Todas as linhas completamente vazias foram removidas. Além disso, os campos nulos de colunas importantes foram substituídos por valores padrão, como `-1` para colunas numéricas (`QTD_VENDIDA`, `IDADE`, `SEXO`) e `"N/A"` para colunas de texto.
+* **Enriquecimento com dados geográficos:** O dataframe de vendas foi unido ao dataframe de municípios (disponível na camada `bronze_layer`) para adicionar informações geográficas, como a latitude e longitude, que serão essenciais para visualizações no databricks Dashboards.
+* **Padronização de colunas:** Os nomes das colunas foram renomeados para o formato `snake_case`, melhorando a legibilidade e a consistência do conjunto de dados final.
+* **Conversão de idade:** A idade dos compradores, que estava dividida em duas colunas (`IDADE` e `UNIDADE_IDADE`), foi unificada em uma única coluna (`idade_anos`) para simplificar a análise. O script também garante que idades menores que 1 ano sejam convertidas para 1, evitando valores inconsistentes.
+* **Conversão de data:** As colunas `ANO_VENDA` e `MES_VENDA` foram combinadas para criar uma nova coluna `data_venda` no formato de data (`yyyy-MM-dd`), facilitando a análise temporal.
+
+O resultado final é a tabela `vendas`, que é a principal fonte de dados para as próximas análises.
+
+
+## Camada Ouro: Implementação do star schema
+**Tabelas de Dimensão:**
+
+* **`dim_data` (`dim_datas.py`):** Tabela que armazena informações únicas sobre cada data de venda, incluindo ano e mês.
+* **`dim_comprador` (`dim_comprador.py`):** Contém informações sobre os compradores, como sexo e idade.
+* **`dim_localizacao_venda` (`dim_localizacao.py`):** Armazena dados geográficos da venda, como UF, município, capital, região, latitude e longitude. Um tratamento especial foi realizado para o Distrito Federal.
+* **`dim_prescritor` (`dim_prescritor.py`):** Contém informações sobre o profissional que prescreveu o medicamento, incluindo conselho, tipo de receituário e UF do conselho.
+* **`dim_produto` (`dim_produto.py`):** Tabela com informações únicas sobre os medicamentos, incluindo o princípio ativo, a descrição da apresentação, a unidade de medida e o código CID10. Foi criada uma UDF (User-Defined Function) para classificar o formato do medicamento (ex.: "Comprimido", "Cápsula").
+
+**Tabela Fato:**
+
+* **`ft_vendas` (`fact_table.py`):** A tabela central do modelo, que armazena a quantidade de medicamentos vendidos (`qtd_vendida`) e faz a ligação com as tabelas de dimensão através de chaves estrangeiras. A criação da tabela de fatos envolveu a união (via left join) de todas as dimensões com a tabela da camada Silver.
+
+
+## Orquestração de Pipeline
+
+O pipeline ETL/ELT do projeto é orquestrado no Databricks Jobs, garantindo a execução programada e automatizada de todo o fluxo de dados. O processo foi dividido em duas pipelines principais, que rodam em sequência:
+
+### Código da Pipeline
+
+Este código pode ser replicado em seu próprio ambiente do Databricks para criar os jobs de orquestração.
+Importante ressaltar que deve-se alterar na parte de notebook_path para o seu email utilizado dentro do workspace databricks
+
+```yaml
+resources:
+  jobs:
+    pipeline_raw_to_silver:
+      name: pipeline_raw_to_silver
+      tasks:
+        - task_key: Configuracao_do_Catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/Arquitetura/Arquitetura_catalog
+            source: WORKSPACE
+        - task_key: csv_municipios
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/latitude_lingitude_dados
+            source: WORKSPACE
+        - task_key: ingerindo_dados_brutos
+          depends_on:
+            - task_key: Configuracao_do_Catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/baixando_dados_brutos
+            source: WORKSPACE
+        - task_key: 2014_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2014_dados
+            source: WORKSPACE
+        - task_key: 2015_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2015_dados
+            source: WORKSPACE
+        - task_key: 2016_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2016_dados
+            source: WORKSPACE
+        - task_key: 2017_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2017_dados
+            source: WORKSPACE
+        - task_key: 2018_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2018_dados
+            source: WORKSPACE
+        - task_key: 2019_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2019_dados
+            source: WORKSPACE
+        - task_key: 2020_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2020_dados
+            source: WORKSPACE
+        - task_key: 2021_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2021_dados
+            source: WORKSPACE
+        - task_key: tratamento_e_unificacao
+          depends_on:
+            - task_key: 2018_data
+            - task_key: 2019_data
+            - task_key: 2014_data
+            - task_key: 2020_data
+            - task_key: csv_municipios
+            - task_key: 2021_data
+            - task_key: 2016_data
+            - task_key: 2017_data
+            - task_key: 2015_data
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/silver/unificando_e_tratando_dados
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+
+    Pipeline_gold_layer:
+      name: Pipeline_gold_layer
+      tasks:
+        - task_key: dim_comprador
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_comprador
+            source: WORKSPACE
+        - task_key: dim_data
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_datas
+            source: WORKSPACE
+        - task_key: dim_lococalizacao
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_localizacao
+            source: WORKSPACE
+        - task_key: dim_prescritor
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_prescritor
+            source: WORKSPACE
+        - task_key: dim_produto
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_produto
+            source: WORKSPACE
+        - task_key: fact_vendas
+          depends_on:
+            - task_key: dim_prescritor
+            - task_key: dim_produto
+            - task_key: dim_data
+            - task_key: dim_comprador
+            - task_key: dim_lococalizacao
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/fact_table
+            source: WORKSPACE
+        - task_key: vw_principio_ativo_por_cidade
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: 822b62fe-ce9e-4c6a-a574-16bc108b5a40
+            warehouse_id: a3714afe4ba7bcc7
+        - task_key: vw_qtd_vendida_principio_ativo_temporal
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: ef3630c9-b523-4cdc-b0a2-afb4ce981501
+            warehouse_id: a3714afe4ba7bcc7
+        - task_key: vw_relatorio
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: 3eb9b32c-7713-4420-9d10-825a96122144
+            warehouse_id: a3714afe4ba7bcc7
+        - task_key: vw_top_principios_mais_vendidos
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: ae4a8ba1-af44-40a6-8175-ce9372a0a217
+            warehouse_id: a3714afe4ba7bcc7
+        - task_key: vw_vendas_por_cidade
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: 3bce32bf-256c-4cc5-a84f-5c1b8c1e28b2
+            warehouse_id: a3714afe4ba7bcc7
+        - task_key: vw_vendas_por_uf
+          depends_on:
+            - task_key: fact_vendas
+          sql_task:
+            query:
+              query_id: 3fa4a0be-2a4d-43a8-94a2-c9cbbeef238f
+            warehouse_id: a3714afe4ba7bcc7
+      queue:
+        enabled: true
+      performance_target: STANDARD
+
+
+    Pipeline_inteira:
+      name: Pipeline_inteira
+      tasks:
+        - task_key: raw_to_silver
+          run_job_task:
+            job_id: 144226744122479
+        - task_key: gold_layer
+          depends_on:
+            - task_key: raw_to_silver
+          run_job_task:
+            job_id: 958712194532443
+      queue:
+        enabled: true
+```
+
+## Genie e Governança com Unity Catalog
+
+Para melhorar a governança dos dados e a experiência dos usuários, foram adicionadas descrições detalhadas a cada tabela de dimensão e à tabela de fatos diretamente no Unity Catalog. Essa documentação semântica é o que possibilita a funcionalidade do Genie, que permite aos usuários explorar os dados e realizar consultas usando linguagem natural, sem a necessidade de conhecimento técnico de SQL.
+
+* **`dim_comprador`:** Esta tabela contém informações de clientes relacionadas ao sexo e à idade. Cada combinação dessas características recebe um identificador único. A tabela é utilizada como dimensão em um modelo star schema, permitindo análises demográficas dos clientes.
+* **`dim_data`:** Esta tabela contém informações sobre as datas das vendas, incluindo data completa, ano e mês. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises temporais das vendas.
+* **`dim_localizacao_venda`:** Esta tabela contém informações sobre a geolocalização das vendas, utilizada para suportar análises geográficas. Inclui os campos `uf_venda`, `nome_uf`, `municipio_venda`, `latitude_municipio`, `longitude_municipio`, `capital`, `latitude_uf`, `longitude_uf` e `regiao`. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises espaciais das vendas.
+* **`dim_prescritor`:** Esta tabela contém informações sobre o prescritor da receita do medicamento vendido. Inclui os campos `conselho_prescritor`, `tipo_receituario` e `uf_conselho_prescritor`. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises relacionadas ao prescritor.
+* **`dim_produto`:** Esta tabela contém informações sobre o medicamento vendido. Inclui os campos `princripio_ativo`, `descricao_apresentacao`, `unidade_medida`, `CID10`, `formato`. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises relacionadas aos medicamentos.
+* **`ft_vendas`:** Esta tabela contém informações sobre as vendas de medicamentos. Inclui o campo `qtd_vendida`, juntamente com os identificadores de cada tabela dimensão no modelo star schema. Esta tabela desempenha o papel de fato, centralizando os dados transacionais que permitem análises de volume de vendas, distribuição geográfica, período de ocorrência e demais métricas relacionadas.
+
 
 ## Análises de Business Intelligence (BI)
-
-Com os dados tratados e enriquecidos nas camadas **Silver** e **Gold**, será possível criar painéis de BI para as seguintes análises:
-
-* **Relatório Geral com Filtros:** Análise por meio dos filtros podendo ver dados conforme o desejado
-* **Graficos de vendas de medicamentos por Estado/cidade:** Análise do numero de vendas total de medicamentos por cidade.
-* **Vendas por Região e Período:** Análise do volume de vendas por Unidade Federativa (UF), Município, Ano e Mês. Indicadores como o ranking dos 10 estados ou municípios com maior volume de consumo serão desenvolvidos. Essa análise é viável pois os dados contêm informações completas de geolocalização e tempo.
-* **Ranking de Princípios Ativos:** Identificação e classificação dos princípios ativos mais vendidos. 
-* **Mapa de vendas total no Brasil:** Gráfico em formato de mapa com o total vendas por estado, mostrando visualmente as vendas por estado por meio de granularidade
-* **Gráfico temporal de histórico de vendas por princípio ativo:** Ánalises das alterações de venda de um princípio ativo ao longo dos anos
+Com os dados tratados e enriquecidos nas camadas Silver e Gold, foram desenvolvidos os seguintes painéis de BI para análise:
+* **Vendas por Estado:** Um mapa que exibe as vendas totais por estado, utilizando as colunas de latitude e longitude para uma visualização geográfica precisa.
+* **Ranking de Medicamentos Mais Vendidos:**  Um dashboard que classifica os princípios ativos por volume de vendas, destacando os medicamentos mais populares no período.
+* **Vendas por Cidade:*** Um painel que permite analisar o total de vendas por município, permitindo uma visão detalhada do consumo em nível local.
+* **Histórico Temporal de Vendas:** Uma análise que mostra o histórico de vendas por princípio ativo ao longo do tempo.
+* **Relatório Geral:** Um dashboard abrangente que consolida as principais métricas e permite a aplicação de filtros em todos os campos, como período, cidade e estado, para análises personalizadas.
 
 
 ## Tecnologias Utilizadas
@@ -52,3 +293,5 @@ O projeto foi inteiramente desenvolvido no **Databricks**, que atua como um ambi
 * **Linguagens de Programação:** Python e SQL
 * **Framework de Processamento:** Apache Spark, nativamente integrado ao Databricks
 * **Controle de Versão:** Git/GitHub, para gerenciar o versionamento do código-fonte
+
+Todo o código-fonte do projeto, incluindo scripts de ingestão e transformação, será disponibilizado publicamente neste repositório do GitHub para promover a transparência e permitir que outros possam estudar a metodologia.
