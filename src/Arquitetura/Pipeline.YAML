@@ -1,0 +1,142 @@
+resources:
+  jobs:
+    pipeline_raw_to_silver:
+      name: pipeline_raw_to_silver
+      tasks:
+        - task_key: Configuracao_do_Catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/Arquitetura/Arquitetura_catalog
+            source: WORKSPACE
+        - task_key: csv_municipios
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/latitude_lingitude_dados
+            source: WORKSPACE
+        - task_key: ingerindo_dados_brutos
+          depends_on:
+            - task_key: Configuracao_do_Catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/baixando_dados_brutos
+            source: WORKSPACE
+        - task_key: 2014_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2014_dados
+            source: WORKSPACE
+        - task_key: 2015_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2015_dados
+            source: WORKSPACE
+        - task_key: 2016_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2016_dados
+            source: WORKSPACE
+        - task_key: 2017_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2017_dados
+            source: WORKSPACE
+        - task_key: 2018_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2018_dados
+            source: WORKSPACE
+        - task_key: 2019_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2019_dados
+            source: WORKSPACE
+        - task_key: 2020_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2020_dados
+            source: WORKSPACE
+        - task_key: 2021_data
+          depends_on:
+            - task_key: ingerindo_dados_brutos
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2021_dados
+            source: WORKSPACE
+        - task_key: tratamento_e_unificacao
+          depends_on:
+            - task_key: 2018_data
+            - task_key: 2019_data
+            - task_key: 2014_data
+            - task_key: 2020_data
+            - task_key: csv_municipios
+            - task_key: 2021_data
+            - task_key: 2016_data
+            - task_key: 2017_data
+            - task_key: 2015_data
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/silver/unificando_e_tratando_dados
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+
+    Pipeline_gold_layer:
+      name: Pipeline_gold_layer
+      tasks:
+        - task_key: dim_comprador
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_comprador
+            source: WORKSPACE
+        - task_key: dim_data
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_datas
+            source: WORKSPACE
+        - task_key: dim_lococalizacao
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_localizacao
+            source: WORKSPACE
+        - task_key: dim_prescritor
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_prescritor
+            source: WORKSPACE
+        - task_key: dim_produto
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_produto
+            source: WORKSPACE
+        - task_key: fact_vendas
+          depends_on:
+            - task_key: dim_prescritor
+            - task_key: dim_produto
+            - task_key: dim_data
+            - task_key: dim_comprador
+            - task_key: dim_lococalizacao
+          notebook_task:
+            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/fact_table
+            source: WORKSPACE
+        - task_key: Views
+          depends_on:
+            - task_key: fact_vendas
+          notebook_task:
+              notebook_path: /Workspace/Users/user@email.com/databricks_etl_controlled_medication_sales/src/BI/Views
+              source: WORKSPACE
+      queue:
+          enabled: true
+      performance_target: STANDARD
+
+
+    Pipeline_inteira:
+      name: Pipeline_inteira
+      tasks:
+        - task_key: raw_to_silver
+          run_job_task:
+            job_id: 144226744122479
+        - task_key: gold_layer
+          depends_on:
+            - task_key: raw_to_silver
+          run_job_task:
+            job_id: 958712194532443
+      queue:
+        enabled: true
