@@ -1,0 +1,1918 @@
+{
+  "datasets": [
+    {
+      "name": "245645c0",
+      "displayName": "vw_vendas_por_uf",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_vendas_por_uf"
+      ]
+    },
+    {
+      "name": "adc0f65b",
+      "displayName": "vw_vendas_por_cidade",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_vendas_por_cidade"
+      ]
+    },
+    {
+      "name": "98a9e955",
+      "displayName": "vw_qtd_vendida_principio_ativo_temporal",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_qtd_vendida_principio_ativo_temporal"
+      ]
+    },
+    {
+      "name": "e1c2153d",
+      "displayName": "vw_principio_ativo_por_cidade",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_principio_ativo_por_cidade"
+      ]
+    },
+    {
+      "name": "d69ed145",
+      "displayName": "vw_top_principios_mais_vendidos",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_top_principios_mais_vendidos"
+      ]
+    },
+    {
+      "name": "37f9a136",
+      "displayName": "vw_relatorio",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.vw_relatorio"
+      ]
+    },
+    {
+      "name": "08d06d18",
+      "displayName": "dim_comprador",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.dim_comprador"
+      ]
+    },
+    {
+      "name": "5f66c762",
+      "displayName": "dim_data",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.dim_data"
+      ]
+    },
+    {
+      "name": "dc82f52f",
+      "displayName": "dim_localizacao_venda",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.dim_localizacao_venda"
+      ]
+    },
+    {
+      "name": "bc393baa",
+      "displayName": "dim_prescritor",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.dim_prescritor"
+      ]
+    },
+    {
+      "name": "a713ca6f",
+      "displayName": "ft_vendas",
+      "queryLines": [
+        "SELECT * FROM controlled_medication_data.gold_layer.ft_vendas"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "ab4c6801",
+      "displayName": "Visão Geral",
+      "layout": [
+        {
+          "widget": {
+            "name": "61f53483",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "245645c0",
+                  "fields": [
+                    {
+                      "name": "sum(qtd_vendas)",
+                      "expression": "SUM(`qtd_vendas`)"
+                    },
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(qtd_vendas)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "title": "total vendas"
+                  },
+                  "displayName": "total vendas"
+                },
+                "y": {
+                  "fieldName": "uf_venda",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "axis": {
+                    "title": "Estado"
+                  },
+                  "displayName": "Estado"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Vendas no Brasil total"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 4,
+            "width": 4,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "ea08adbd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "245645c0",
+                  "fields": [
+                    {
+                      "name": "qtd_vendas",
+                      "expression": "`qtd_vendas`"
+                    },
+                    {
+                      "name": "latitude_uf",
+                      "expression": "`latitude_uf`"
+                    },
+                    {
+                      "name": "longitude_uf",
+                      "expression": "`longitude_uf`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "symbol-map",
+              "encodings": {
+                "coordinates": {
+                  "latitude": {
+                    "fieldName": "latitude_uf",
+                    "displayName": "latitude_uf"
+                  },
+                  "longitude": {
+                    "fieldName": "longitude_uf",
+                    "displayName": "longitude_uf"
+                  }
+                },
+                "color": {
+                  "fieldName": "qtd_vendas",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "blues"
+                    }
+                  },
+                  "displayName": "Total de vendas"
+                }
+              },
+              "mark": {
+                "size": 2,
+                "opacity": 0.89
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Vendas no Brasil total"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 2,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "86070287",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Dashboard Sistema Nacional de Gerenciamento de Produtos Controlados (SNGPC)"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "915ef752",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d69ed145",
+                  "fields": [
+                    {
+                      "name": "sum(qtd_vendida_total)",
+                      "expression": "SUM(`qtd_vendida_total`)"
+                    },
+                    {
+                      "name": "principio_ativo",
+                      "expression": "`principio_ativo`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(qtd_vendida_total)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "title": "Quantidade de vendas"
+                  },
+                  "displayName": "Quantidade de vendas"
+                },
+                "y": {
+                  "fieldName": "principio_ativo",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "principio_ativo"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "2dbc476c",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Principios ativos mais vendidos"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "b9d309d5",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Vendas Total por Estado"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "2883312d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "adc0f65b",
+                  "fields": [
+                    {
+                      "name": "latitude_municipio",
+                      "expression": "`latitude_municipio`"
+                    },
+                    {
+                      "name": "longitude_municipio",
+                      "expression": "`longitude_municipio`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`uf_venda` IN (`uf_venda`) OR TRUE"
+                    },
+                    {
+                      "expression": "`municipio_venda` IN (`municipio_venda`) OR TRUE"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "symbol-map",
+              "encodings": {
+                "coordinates": {
+                  "latitude": {
+                    "fieldName": "latitude_municipio",
+                    "displayName": "latitude_municipio"
+                  },
+                  "longitude": {
+                    "fieldName": "longitude_municipio",
+                    "displayName": "longitude_municipio"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 27,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "1f34876b",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_uf_venda",
+                "query": {
+                  "datasetName": "adc0f65b",
+                  "fields": [
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    },
+                    {
+                      "name": "uf_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "uf_venda",
+                    "displayName": "uf_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_uf_venda"
+                  }
+                ]
+              },
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "SP"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": false,
+                "title": "Estado"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 25,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "46867630",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Vendas de medicamentos por cidade"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 25,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "8ec5cb63",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_municipio_venda",
+                "query": {
+                  "datasetName": "adc0f65b",
+                  "fields": [
+                    {
+                      "name": "municipio_venda",
+                      "expression": "`municipio_venda`"
+                    },
+                    {
+                      "name": "municipio_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "municipio_venda",
+                    "displayName": "municipio_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_municipio_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ciadde"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 25,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "d9029da9",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "adc0f65b",
+                  "fields": [
+                    {
+                      "name": "numero_vendas",
+                      "expression": "`numero_vendas`"
+                    },
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    },
+                    {
+                      "name": "municipio_venda",
+                      "expression": "`municipio_venda`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "numero_vendas",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 100000,
+                    "title": "total de vendas",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "numero_vendas"
+                  },
+                  {
+                    "fieldName": "uf_venda",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100001,
+                    "title": "Estado",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "uf_venda"
+                  },
+                  {
+                    "fieldName": "municipio_venda",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100002,
+                    "title": "Cidade",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "municipio_venda"
+                  }
+                ]
+              },
+              "invisibleColumns": [
+                {
+                  "numberFormat": "0.00",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "latitude_municipio",
+                  "type": "float",
+                  "displayAs": "number",
+                  "order": 100003,
+                  "title": "latitude_municipio",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0.00",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "longitude_municipio",
+                  "type": "float",
+                  "displayAs": "number",
+                  "order": 100004,
+                  "title": "longitude_municipio",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 27,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "ccecf2f1",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS"
+    },
+    {
+      "name": "a91aad33",
+      "displayName": "Detalhes",
+      "layout": [
+        {
+          "widget": {
+            "name": "878111d9",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Detalhes por medicamento"
+              ]
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "c00abfaa",
+            "multilineTextboxSpec": {
+              "lines": [
+                "![Image](https://www.gov.br/anvisa/pt-br/assuntos/fiscalizacao-e-monitoramento/sngpc/capa-sngpc/@@govbr.institucional.banner/ea3ec8c7-d0be-4531-a790-6801ceb5c482/@@images/c1141e1b-bf7a-46d5-b7f9-7e6b50c7d6de.png)"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f3228b4c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "98a9e955",
+                  "fields": [
+                    {
+                      "name": "data_venda",
+                      "expression": "`data_venda`"
+                    },
+                    {
+                      "name": "sum(qtd_vendida)",
+                      "expression": "`sum(qtd_vendida)`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`principio_ativo` IN (`principio_ativo`) OR TRUE"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "data_venda",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "axis": {
+                    "title": "Data"
+                  },
+                  "displayName": "Data"
+                },
+                "y": {
+                  "fieldName": "sum(qtd_vendida)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "title": "Quantidade de vendas"
+                  },
+                  "displayName": "Quantidade de vendas"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Vendas de principio ativo ao longo dos anos"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "0bbfeea1",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f085084ec91a4da6bfca1a712fbc0a_principio_ativo",
+                "query": {
+                  "datasetName": "98a9e955",
+                  "fields": [
+                    {
+                      "name": "principio_ativo",
+                      "expression": "`principio_ativo`"
+                    },
+                    {
+                      "name": "principio_ativo_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "principio_ativo",
+                    "displayName": "principio_ativo",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f085084ec91a4da6bfca1a712fbc0a_principio_ativo"
+                  }
+                ]
+              },
+              "disallowAll": true,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "CLORIDRATO DE SERTRALINA"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Princípio Ativo"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f16b1544",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## total de vendas por principio ativo com filtros"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bdd7f340",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Histórico de vendas por princípio ativo"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "c76d2dd7",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "e1c2153d",
+                  "fields": [
+                    {
+                      "name": "principio_ativo",
+                      "expression": "`principio_ativo`"
+                    },
+                    {
+                      "name": "Cidade",
+                      "expression": "`Cidade`"
+                    },
+                    {
+                      "name": "Estado",
+                      "expression": "`Estado`"
+                    },
+                    {
+                      "name": "qtd_vendida",
+                      "expression": "`qtd_vendida`"
+                    },
+                    {
+                      "name": "data_venda",
+                      "expression": "`data_venda`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "principio_ativo",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 0,
+                    "title": "Princípio Ativo",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "cellFormat": {
+                      "default": {
+                        "foregroundColor": null
+                      },
+                      "rules": [
+                        {
+                          "if": {
+                            "column": "principio_ativo",
+                            "fn": "=",
+                            "literal": ""
+                          },
+                          "value": {
+                            "foregroundColor": null
+                          }
+                        }
+                      ]
+                    },
+                    "displayName": "principio_ativo"
+                  },
+                  {
+                    "fieldName": "Cidade",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 1,
+                    "title": "Cidade",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Cidade"
+                  },
+                  {
+                    "fieldName": "Estado",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 2,
+                    "title": "Estado",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "Estado"
+                  },
+                  {
+                    "fieldName": "qtd_vendida",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 3,
+                    "title": "Quantidade vendida",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "qtd_vendida"
+                  },
+                  {
+                    "fieldName": "data_venda",
+                    "dateTimeFormat": "DD/MM/YYYY",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "date",
+                    "displayAs": "datetime",
+                    "visible": true,
+                    "order": 4,
+                    "title": "Data venda",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "data_venda"
+                  }
+                ]
+              },
+              "invisibleColumns": [],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "8d78186e",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08756f9cd1b2080f9bf9e990636d5_Cidade",
+                "query": {
+                  "datasetName": "e1c2153d",
+                  "fields": [
+                    {
+                      "name": "Cidade",
+                      "expression": "`Cidade`"
+                    },
+                    {
+                      "name": "Cidade_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "Cidade",
+                    "displayName": "Cidade",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08756f9cd1b2080f9bf9e990636d5_Cidade"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Cidade"
+              },
+              "disallowAll": false,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "SÃO PAULO"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 13,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "bf541f30",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_uf_venda",
+                "query": {
+                  "datasetName": "adc0f65b",
+                  "fields": [
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    },
+                    {
+                      "name": "uf_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "uf_venda",
+                    "displayName": "uf_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08504c0ae1c2f82d8d505ee46ba75_uf_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Estado"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "SP"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 13,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "a2e0165d",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08756f9cd1b2080f9bf9e990636d5_data_venda",
+                "query": {
+                  "datasetName": "e1c2153d",
+                  "fields": [
+                    {
+                      "name": "data_venda",
+                      "expression": "`data_venda`"
+                    },
+                    {
+                      "name": "data_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "data_venda",
+                    "displayName": "data_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f08756f9cd1b2080f9bf9e990636d5_data_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Período"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "DATE",
+                    "min": {
+                      "value": "2015-08-01T00:00:00.000"
+                    },
+                    "max": {
+                      "value": "2015-08-31T23:59:59.999"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 3,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "4f72f862",
+      "displayName": "Relatório Geral",
+      "layout": [
+        {
+          "widget": {
+            "name": "85baf113",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "data_venda",
+                      "expression": "`data_venda`"
+                    },
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    },
+                    {
+                      "name": "municipio_venda",
+                      "expression": "`municipio_venda`"
+                    },
+                    {
+                      "name": "principio_ativo",
+                      "expression": "`principio_ativo`"
+                    },
+                    {
+                      "name": "conselho_prescritor",
+                      "expression": "`conselho_prescritor`"
+                    },
+                    {
+                      "name": "uf_conselho_prescritor",
+                      "expression": "`uf_conselho_prescritor`"
+                    },
+                    {
+                      "name": "qtd_vendida",
+                      "expression": "`qtd_vendida`"
+                    },
+                    {
+                      "name": "CID10",
+                      "expression": "`CID10`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "data_venda",
+                    "dateTimeFormat": "DD/MM/YYYY",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "date",
+                    "displayAs": "datetime",
+                    "visible": true,
+                    "order": 0,
+                    "title": "Data Venda",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "data_venda"
+                  },
+                  {
+                    "fieldName": "uf_venda",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 1,
+                    "title": "UF Venda",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "uf_venda"
+                  },
+                  {
+                    "fieldName": "municipio_venda",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 2,
+                    "title": "Cidade",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "municipio_venda"
+                  },
+                  {
+                    "fieldName": "principio_ativo",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 4,
+                    "title": "Princípio Ativo",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "principio_ativo"
+                  },
+                  {
+                    "fieldName": "conselho_prescritor",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 5,
+                    "title": "Conselho Prescritor",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "conselho_prescritor"
+                  },
+                  {
+                    "fieldName": "uf_conselho_prescritor",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 6,
+                    "title": "UF conselho prescritor",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "uf_conselho_prescritor"
+                  },
+                  {
+                    "fieldName": "qtd_vendida",
+                    "numberFormat": "0",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "integer",
+                    "displayAs": "number",
+                    "visible": true,
+                    "order": 7,
+                    "title": "Quantidade Vendida",
+                    "allowSearch": false,
+                    "alignContent": "right",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "qtd_vendida"
+                  },
+                  {
+                    "fieldName": "CID10",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 8,
+                    "title": "CID10",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "displayName": "CID10"
+                  }
+                ]
+              },
+              "invisibleColumns": [
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "capital",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 3,
+                  "title": "capital",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "frame": {
+                "showTitle": false
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "4da5e2f8",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Relatorio Geral "
+              ]
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "a0b140d1",
+            "multilineTextboxSpec": {
+              "lines": [
+                "![Image](https://www.gov.br/anvisa/pt-br/assuntos/fiscalizacao-e-monitoramento/sngpc/capa-sngpc/@@govbr.institucional.banner/ea3ec8c7-d0be-4531-a790-6801ceb5c482/@@images/c1141e1b-bf7a-46d5-b7f9-7e6b50c7d6de.png)"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "7051026c",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_uf_venda",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "uf_venda",
+                      "expression": "`uf_venda`"
+                    },
+                    {
+                      "name": "uf_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "uf_venda",
+                    "displayName": "uf_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_uf_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "UF Venda"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "1b003121",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_capital",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "capital",
+                      "expression": "`capital`"
+                    },
+                    {
+                      "name": "capital_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "capital",
+                    "displayName": "capital",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_capital"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "É Capital ?"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "29e3015c",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_conselho_prescritor",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "conselho_prescritor",
+                      "expression": "`conselho_prescritor`"
+                    },
+                    {
+                      "name": "conselho_prescritor_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "conselho_prescritor",
+                    "displayName": "conselho_prescritor",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_conselho_prescritor"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Conselho Prescritor"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "f3262b56",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_municipio_venda",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "municipio_venda",
+                      "expression": "`municipio_venda`"
+                    },
+                    {
+                      "name": "municipio_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "municipio_venda",
+                    "displayName": "municipio_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_municipio_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Municipio Venda"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "c6a1b804",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_principio_ativo",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "principio_ativo",
+                      "expression": "`principio_ativo`"
+                    },
+                    {
+                      "name": "principio_ativo_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "principio_ativo",
+                    "displayName": "principio_ativo",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_principio_ativo"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Princípio Ativo"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "2fc3d6b5",
+            "queries": [
+              {
+                "name": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_data_venda",
+                "query": {
+                  "datasetName": "37f9a136",
+                  "fields": [
+                    {
+                      "name": "data_venda",
+                      "expression": "`data_venda`"
+                    },
+                    {
+                      "name": "data_venda_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "data_venda",
+                    "displayName": "data_venda",
+                    "queryName": "dashboards/01f082b7964e1d5b8aeb9b3443af3b3c/datasets/01f0876269a9117daefc446ef15c7347_data_venda"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Período"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 3,
+            "width": 2,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    }
+  }
+}
