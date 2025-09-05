@@ -104,7 +104,7 @@ Com os dados tratados e enriquecidos nas camadas Silver e Gold, foram desenvolvi
   ![chrome_nTGpnnHe0A](https://github.com/user-attachments/assets/b609a501-3614-4dc3-8cc7-654d828c5d9b)
 
 
-* **Vendas por Cidade:*** Um painel que permite analisar o total de vendas por município, permitindo uma visão detalhada do consumo em nível local.
+* **Vendas por Cidade:** Um painel que permite analisar o total de vendas por município, permitindo uma visão detalhada do consumo em nível local.
 * **Histórico Temporal de Vendas:** Uma análise que mostra o histórico de vendas por princípio ativo ao longo do tempo.
    ![chrome_8zxMDcESyB](https://github.com/user-attachments/assets/51f0fe41-b078-4d50-8764-c5980e550e51)
   
