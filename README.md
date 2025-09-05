@@ -80,189 +80,9 @@ O pipeline ETL/ELT do projeto é orquestrado no Databricks Jobs, garantindo a ex
 
 ### Código da Pipeline
 
-Este código pode ser replicado em seu próprio ambiente do Databricks para criar os jobs de orquestração.
+Todo Código da pipeline está na pasta arquitetura no arquivo pipeline, copie-o para dentro de um job e ele funcionará, este código pode ser replicado em seu próprio ambiente do Databricks para criar os jobs de orquestração dentro da pasta Arquitatura no arquivo PipeLine.YAML.
 Importante ressaltar que deve-se alterar na parte de notebook_path para o seu email utilizado dentro do workspace databricks
 
-```yaml
-resources:
-  jobs:
-    pipeline_raw_to_silver:
-      name: pipeline_raw_to_silver
-      tasks:
-        - task_key: Configuracao_do_Catalog
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/Arquitetura/Arquitetura_catalog
-            source: WORKSPACE
-        - task_key: csv_municipios
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/latitude_lingitude_dados
-            source: WORKSPACE
-        - task_key: ingerindo_dados_brutos
-          depends_on:
-            - task_key: Configuracao_do_Catalog
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/raw_data/baixando_dados_brutos
-            source: WORKSPACE
-        - task_key: 2014_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2014_dados
-            source: WORKSPACE
-        - task_key: 2015_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2015_dados
-            source: WORKSPACE
-        - task_key: 2016_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2016_dados
-            source: WORKSPACE
-        - task_key: 2017_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2017_dados
-            source: WORKSPACE
-        - task_key: 2018_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2018_dados
-            source: WORKSPACE
-        - task_key: 2019_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2019_dados
-            source: WORKSPACE
-        - task_key: 2020_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2020_dados
-            source: WORKSPACE
-        - task_key: 2021_data
-          depends_on:
-            - task_key: ingerindo_dados_brutos
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/bronze/2021_dados
-            source: WORKSPACE
-        - task_key: tratamento_e_unificacao
-          depends_on:
-            - task_key: 2018_data
-            - task_key: 2019_data
-            - task_key: 2014_data
-            - task_key: 2020_data
-            - task_key: csv_municipios
-            - task_key: 2021_data
-            - task_key: 2016_data
-            - task_key: 2017_data
-            - task_key: 2015_data
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/silver/unificando_e_tratando_dados
-            source: WORKSPACE
-      queue:
-        enabled: true
-      performance_target: PERFORMANCE_OPTIMIZED
-
-    Pipeline_gold_layer:
-      name: Pipeline_gold_layer
-      tasks:
-        - task_key: dim_comprador
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_comprador
-            source: WORKSPACE
-        - task_key: dim_data
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_datas
-            source: WORKSPACE
-        - task_key: dim_lococalizacao
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_localizacao
-            source: WORKSPACE
-        - task_key: dim_prescritor
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_prescritor
-            source: WORKSPACE
-        - task_key: dim_produto
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/dim_produto
-            source: WORKSPACE
-        - task_key: fact_vendas
-          depends_on:
-            - task_key: dim_prescritor
-            - task_key: dim_produto
-            - task_key: dim_data
-            - task_key: dim_comprador
-            - task_key: dim_lococalizacao
-          notebook_task:
-            notebook_path: /Workspace/Users/emailuser@email.com/databricks_etl_controlled_medication_sales/src/gold/fact_table
-            source: WORKSPACE
-        - task_key: vw_principio_ativo_por_cidade
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: 822b62fe-ce9e-4c6a-a574-16bc108b5a40
-            warehouse_id: a3714afe4ba7bcc7
-        - task_key: vw_qtd_vendida_principio_ativo_temporal
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: ef3630c9-b523-4cdc-b0a2-afb4ce981501
-            warehouse_id: a3714afe4ba7bcc7
-        - task_key: vw_relatorio
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: 3eb9b32c-7713-4420-9d10-825a96122144
-            warehouse_id: a3714afe4ba7bcc7
-        - task_key: vw_top_principios_mais_vendidos
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: ae4a8ba1-af44-40a6-8175-ce9372a0a217
-            warehouse_id: a3714afe4ba7bcc7
-        - task_key: vw_vendas_por_cidade
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: 3bce32bf-256c-4cc5-a84f-5c1b8c1e28b2
-            warehouse_id: a3714afe4ba7bcc7
-        - task_key: vw_vendas_por_uf
-          depends_on:
-            - task_key: fact_vendas
-          sql_task:
-            query:
-              query_id: 3fa4a0be-2a4d-43a8-94a2-c9cbbeef238f
-            warehouse_id: a3714afe4ba7bcc7
-      queue:
-        enabled: true
-      performance_target: STANDARD
-
-
-    Pipeline_inteira:
-      name: Pipeline_inteira
-      tasks:
-        - task_key: raw_to_silver
-          run_job_task:
-            job_id: 144226744122479
-        - task_key: gold_layer
-          depends_on:
-            - task_key: raw_to_silver
-          run_job_task:
-            job_id: 958712194532443
-      queue:
-        enabled: true
-```
 
 ## Genie e Governança com Unity Catalog
 
@@ -274,15 +94,22 @@ Para melhorar a governança dos dados e a experiência dos usuários, foram adic
 * **`dim_prescritor`:** Esta tabela contém informações sobre o prescritor da receita do medicamento vendido. Inclui os campos `conselho_prescritor`, `tipo_receituario` e `uf_conselho_prescritor`. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises relacionadas ao prescritor.
 * **`dim_produto`:** Esta tabela contém informações sobre o medicamento vendido. Inclui os campos `princripio_ativo`, `descricao_apresentacao`, `unidade_medida`, `CID10`, `formato`. Cada combinação dessas características possui um identificador único. A tabela é utilizada como dimensão em um modelo star schema, possibilitando análises relacionadas aos medicamentos.
 * **`ft_vendas`:** Esta tabela contém informações sobre as vendas de medicamentos. Inclui o campo `qtd_vendida`, juntamente com os identificadores de cada tabela dimensão no modelo star schema. Esta tabela desempenha o papel de fato, centralizando os dados transacionais que permitem análises de volume de vendas, distribuição geográfica, período de ocorrência e demais métricas relacionadas.
+![chrome_0nTikivXWL](https://github.com/user-attachments/assets/d7288af4-0426-44e1-a720-ee86acaa8727)
 
 
 ## Análises de Business Intelligence (BI)
 Com os dados tratados e enriquecidos nas camadas Silver e Gold, foram desenvolvidos os seguintes painéis de BI para análise:
 * **Vendas por Estado:** Um mapa que exibe as vendas totais por estado, utilizando as colunas de latitude e longitude para uma visualização geográfica precisa.
 * **Ranking de Medicamentos Mais Vendidos:**  Um dashboard que classifica os princípios ativos por volume de vendas, destacando os medicamentos mais populares no período.
+  ![chrome_nTGpnnHe0A](https://github.com/user-attachments/assets/b609a501-3614-4dc3-8cc7-654d828c5d9b)
+
+
 * **Vendas por Cidade:*** Um painel que permite analisar o total de vendas por município, permitindo uma visão detalhada do consumo em nível local.
 * **Histórico Temporal de Vendas:** Uma análise que mostra o histórico de vendas por princípio ativo ao longo do tempo.
+   ![chrome_8zxMDcESyB](https://github.com/user-attachments/assets/51f0fe41-b078-4d50-8764-c5980e550e51)
+  
 * **Relatório Geral:** Um dashboard abrangente que consolida as principais métricas e permite a aplicação de filtros em todos os campos, como período, cidade e estado, para análises personalizadas.
+![chrome_Kfl1E5xZCX](https://github.com/user-attachments/assets/8b5abf48-7332-4b0a-8c0a-7b0a239d2801)
 
 
 ## Tecnologias Utilizadas
